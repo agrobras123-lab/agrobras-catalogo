@@ -134,6 +134,27 @@ header{background:#14391f;position:sticky;top:0;z-index:100;box-shadow:0 2px 12p
 .empty p{font-size:13px;color:#8aa891;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:#b5d9be;border-radius:2px;}
+
+/* ── Desktop / tablet: aproveita a largura da tela ───────────────────
+   No mobile o layout permanece em coluna única (max-width:520px). A
+   partir de 768px, as barras ficam mais largas e os grupos de categoria
+   passam a um grid de múltiplas colunas. */
+@media (min-width:768px){
+  .hdr,.upd-in,.cart-in{max-width:960px;}
+  .pills{max-width:960px;}
+  .srch-wrap{max-width:960px;}
+  .list-wrap{max-width:980px;padding-left:8px;padding-right:8px;}
+  #product-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(440px,1fr));
+    gap:8px;
+    align-items:start;
+  }
+  .group{margin:8px;}
+}
+@media (min-width:1100px){
+  .list-wrap{max-width:1120px;}
+}
 </style>
 </head>
 <body>
@@ -368,11 +389,17 @@ function buildPills(){
 }
 function setCat(c){activeCat=c;buildPills();renderList();}
 
+// Normaliza para busca: minúsculas e sem acentos ("Limão" -> "limao").
+function normalize(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+
 function renderList(){
-  const q=searchQ.toLowerCase().trim();
+  // Cada palavra digitada deve aparecer no nome OU na categoria (lógica AND
+  // entre termos), de modo que "tomate cx" encontre "Tomate Italiano Cx".
+  const terms=normalize(searchQ).split(/\s+/).filter(Boolean);
   const filtered=allProducts.filter(p=>{
     const mc=activeCat==='Todos'||p.category===activeCat;
-    const ms=!q||p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q);
+    const hay=normalize(p.name)+' '+normalize(p.category);
+    const ms=terms.every(t=>hay.includes(t));
     return mc&&ms;
   });
   const emptyEl=document.getElementById('empty');
