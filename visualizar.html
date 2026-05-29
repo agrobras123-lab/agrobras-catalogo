@@ -104,6 +104,12 @@ header{background:#14391f;position:sticky;top:0;z-index:100;box-shadow:0 2px 12p
     <button class="refresh-btn" onclick="loadProducts()" title="Atualizar">↻</button>
   </div>
 </div>
+<div id="validity-bar" style="background:#f5a623;padding:8px 16px;display:none;">
+  <div style="max-width:520px;margin:0 auto;display:flex;align-items:center;gap:8px;">
+    <span style="font-size:16px;">⚠️</span>
+    <span id="validity-msg" style="font-size:12px;font-weight:600;color:#fff;line-height:1.4;"></span>
+  </div>
+</div>
 <div class="pills-wrap"><div class="pills" id="pills"></div></div>
 <div class="search-wrap">
   <div class="search-box">
@@ -160,6 +166,29 @@ function getEmoji(p){
 function getCatLabel(c){return CAT_LABEL[c.toLowerCase()]||c;}
 function getCatEmoji(c){return CAT_EMOJI[c.toLowerCase()]||'🌱';}
 let allProducts=[],activeCat='Todos',searchQ='';
+function checkValidity(updatedAt) {
+  const bar = document.getElementById('validity-bar');
+  const msg = document.getElementById('validity-msg');
+  if (!updatedAt) return;
+
+  const updated = new Date(updatedAt);
+  const today = new Date();
+  const updDay = updated.toDateString();
+  const todDay = today.toDateString();
+
+  const dayName = updated.toLocaleDateString('pt-BR', {weekday:'long'});
+  const dateStr = updated.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric'});
+
+  if (updDay === todDay) {
+    bar.style.background = '#1f5c2f';
+    msg.textContent = '✅ Tabela válida para HOJE, ' + dayName + ' ' + dateStr + '. Preços atualizados neste dia.';
+  } else {
+    bar.style.background = '#c0392b';
+    msg.textContent = '⚠️ Atenção: preços referentes a ' + dateStr + '. Confirme disponibilidade e valor atualizado com nossa equipe.';
+  }
+  bar.style.display = 'block';
+}
+
 async function loadProducts(){
   try{
     const r=await fetch(JSON_URL+'?t='+Date.now());
@@ -176,6 +205,7 @@ function setData(d){
   if(d.updatedAt){const dt=new Date(d.updatedAt);document.getElementById('last-update').textContent=dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
   document.getElementById('skeletons').style.display='none';
   buildPills();renderList();
+  checkValidity(d.updatedAt);
 }
 function buildPills(){
   const cats=['Todos',...new Set(allProducts.map(p=>p.category).filter(Boolean))];
