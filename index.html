@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Agro Bras — Tabela de Preços</title>
+<meta name="description" content="Tabela de preços da Agro Bras: frutas, legumes, hortaliças, temperos, ovos e conservas. Monte seu pedido e envie direto pelo WhatsApp.">
+<meta name="theme-color" content="#14391f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2314391f'/%3E%3Ctext y='.9em' x='50' text-anchor='middle' font-size='62'%3E%F0%9F%A5%A6%3C/text%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Agro Bras — Tabela de Preços">
+<meta property="og:description" content="Frutas, legumes, hortaliças e mais. Monte seu pedido e envie pelo WhatsApp.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Agro Bras — Tabela de Preços">
+<meta name="twitter:description" content="Frutas, legumes, hortaliças e mais. Monte seu pedido e envie pelo WhatsApp.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -130,10 +140,35 @@ header{background:#14391f;position:sticky;top:0;z-index:100;box-shadow:0 2px 12p
 @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .empty{text-align:center;padding:60px 20px;display:none;}
 .empty-icon{font-size:36px;margin-bottom:10px;}
+.err-bar{display:none;align-items:center;gap:8px;background:#fef3da;border:1px solid #f5a623;border-radius:10px;padding:9px 14px;margin:0 16px 8px;max-width:488px;margin-left:auto;margin-right:auto;font-size:12px;color:#9a6000;line-height:1.4;}
+.err-bar .err-retry{margin-left:auto;flex-shrink:0;background:#f5a623;border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border-radius:7px;padding:5px 10px;cursor:pointer;}
+.err-bar .err-retry:active{transform:scale(.96);}
 .empty h3{font-size:15px;font-weight:500;color:#4a6654;margin-bottom:5px;}
 .empty p{font-size:13px;color:#8aa891;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:#b5d9be;border-radius:2px;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+/* ── Desktop / tablet: aproveita a largura da tela ───────────────────
+   No mobile o layout permanece em coluna única (max-width:520px). A
+   partir de 768px, as barras ficam mais largas e os grupos de categoria
+   passam a um grid de múltiplas colunas. */
+@media (min-width:768px){
+  .hdr,.upd-in,.cart-in{max-width:960px;}
+  .pills{max-width:960px;}
+  .srch-wrap{max-width:960px;}
+  .list-wrap{max-width:980px;padding-left:8px;padding-right:8px;}
+  #product-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(440px,1fr));
+    gap:8px;
+    align-items:start;
+  }
+  .group{margin:8px;}
+}
+@media (min-width:1100px){
+  .list-wrap{max-width:1120px;}
+}
 </style>
 </head>
 <body>
@@ -148,18 +183,25 @@ header{background:#14391f;position:sticky;top:0;z-index:100;box-shadow:0 2px 12p
 </header>
 <div class="upd">
   <div class="upd-in">
-    <span class="upd-txt">🕐 Atualizado: <span id="last-update">—</span></span>
-    <button class="ref-btn" onclick="loadProducts()">↻</button>
+    <span class="upd-txt"><span aria-hidden="true">🕐</span> Atualizado: <span id="last-update">—</span></span>
+    <button class="ref-btn" onclick="loadProducts()" aria-label="Atualizar preços" title="Atualizar preços"><span aria-hidden="true">↻</span></button>
   </div>
 </div>
-<div class="pills-wrap"><div class="pills" id="pills"></div></div>
+<nav class="pills-wrap" aria-label="Categorias"><div class="pills" id="pills"></div></nav>
 <div class="srch-wrap">
   <div class="srch-box">
-    <span class="srch-icon">🔍</span>
+    <label for="search-input" class="sr-only">Buscar produto</label>
+    <span class="srch-icon" aria-hidden="true">🔍</span>
     <input type="search" id="search-input" placeholder="Buscar produto..." autocomplete="off">
   </div>
 </div>
-<div class="list-wrap">
+<div class="err-bar" id="err-bar" role="alert">
+  <span aria-hidden="true">⚠️</span>
+  <span id="err-msg">Não foi possível carregar os preços. Verifique sua conexão.</span>
+  <button type="button" class="err-retry" onclick="loadProducts()">Tentar novamente</button>
+</div>
+<main class="list-wrap" aria-label="Catálogo de produtos">
+  <h1 class="sr-only">Tabela de preços Agro Bras</h1>
   <div id="skeletons">
     <div class="skel-group"><div class="skel-hdr"></div>
       <div class="skel-row"><div class="skel-box" style="width:36px;height:36px;border-radius:9px;flex-shrink:0"></div><div style="flex:1"><div class="skel-box" style="height:13px;width:55%;margin-bottom:5px"></div><div class="skel-box" style="height:10px;width:35%"></div></div><div class="skel-box" style="height:14px;width:55px"></div></div>
@@ -174,7 +216,7 @@ header{background:#14391f;position:sticky;top:0;z-index:100;box-shadow:0 2px 12p
     </div>
   </div>
   <div class="empty" id="empty"><div class="empty-icon">🔎</div><h3>Nenhum produto encontrado</h3><p>Tente outro termo de busca</p></div>
-</div>
+</main>
 
 <div class="cart-bar" id="cart-bar">
   <div class="cart-in">
@@ -340,10 +382,18 @@ let allProducts=[],cart={},customItems=[],activeCat='Todos',searchQ='';
 function loadCustom(){try{customItems=JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch(e){customItems=[];}}
 function saveCustom(){localStorage.setItem(LS_KEY,JSON.stringify(customItems));}
 
+let loadFailed=false,refreshTimer=null,retryDelay=0;
+const REFRESH_MS=15*60*1000;
+
+function scheduleRefresh(ms){
+  if(refreshTimer)clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(loadProducts,ms);
+}
+
 async function loadProducts(){
   try{
     const r=await fetch(JSON_URL+'?t='+Date.now());
-    if(!r.ok)throw new Error();
+    if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();const d=j.record||j;
     allProducts=d.products||[];
     if(d.updatedAt){
@@ -351,11 +401,20 @@ async function loadProducts(){
       document.getElementById('last-update').textContent=
         dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     }
+    loadFailed=false;retryDelay=0;
+    document.getElementById('err-bar').style.display='none';
     document.getElementById('skeletons').style.display='none';
     buildPills();renderList();
+    scheduleRefresh(REFRESH_MS);
   }catch(e){
+    loadFailed=true;
     document.getElementById('skeletons').style.display='none';
+    document.getElementById('err-bar').style.display='flex';
     renderList();
+    // Backoff exponencial em caso de falha (30s → 1m → 2m → 4m, teto 5m),
+    // para não martelar o JSONBin enquanto a rede/serviço estiver fora.
+    retryDelay=retryDelay?Math.min(retryDelay*2,5*60*1000):30*1000;
+    scheduleRefresh(retryDelay);
   }
 }
 
@@ -368,16 +427,34 @@ function buildPills(){
 }
 function setCat(c){activeCat=c;buildPills();renderList();}
 
+// Normaliza para busca: minúsculas e sem acentos ("Limão" -> "limao").
+function normalize(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+
 function renderList(){
-  const q=searchQ.toLowerCase().trim();
+  // Cada palavra digitada deve aparecer no nome OU na categoria (lógica AND
+  // entre termos), de modo que "tomate cx" encontre "Tomate Italiano Cx".
+  const terms=normalize(searchQ).split(/\s+/).filter(Boolean);
   const filtered=allProducts.filter(p=>{
     const mc=activeCat==='Todos'||p.category===activeCat;
-    const ms=!q||p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q);
+    const hay=normalize(p.name)+' '+normalize(p.category);
+    const ms=terms.every(t=>hay.includes(t));
     return mc&&ms;
   });
   const emptyEl=document.getElementById('empty');
   const listEl=document.getElementById('product-list');
-  if(!filtered.length){listEl.innerHTML='';emptyEl.style.display='block';return;}
+  if(!filtered.length){
+    listEl.innerHTML='';
+    let icon,title,sub;
+    if(loadFailed&&!allProducts.length){
+      icon='📡';title='Não foi possível carregar os preços';sub='Toque em "Tentar novamente" acima.';
+    }else if(terms.length){
+      icon='🔎';title='Nenhum produto encontrado';sub='Tente outro termo de busca.';
+    }else{
+      icon='🌱';title='Nenhum produto disponível';sub='Volte em instantes — a tabela é atualizada com frequência.';
+    }
+    emptyEl.innerHTML='<div class="empty-icon">'+icon+'</div><h3>'+title+'</h3><p>'+sub+'</p>';
+    emptyEl.style.display='block';return;
+  }
   emptyEl.style.display='none';
   const groups={};
   filtered.forEach(p=>{const c=p.category||'outros';if(!groups[c])groups[c]=[];groups[c].push(p);});
@@ -697,7 +774,7 @@ function clearAll(){cart={};customItems=[];saveCustom();updateCartBar();renderLi
 
 document.getElementById('search-input').addEventListener('input',e=>{searchQ=e.target.value;renderList();});
 loadCustom();loadProducts();
-setInterval(loadProducts,15*60*1000);
+// O agendamento do refresh (e o backoff em caso de erro) é feito dentro de loadProducts().
 </script>
 </body>
 </html>
