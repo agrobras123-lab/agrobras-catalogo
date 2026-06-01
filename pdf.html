@@ -110,6 +110,19 @@ body{background:radial-gradient(900px 420px at 50% -120px,rgba(46,154,71,.10),tr
   .sheet{box-shadow:none!important;border-radius:0!important;}
   .action-bar{display:none!important;}
 }
+/* ── Animações (apenas em tela; impressão fica limpa) ──── */
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes blockIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:no-preference){
+  .sheet{animation:pageIn .45s ease both;}
+  .cat-block{animation:blockIn .5s cubic-bezier(.22,1,.36,1) both;}
+  .cat-block:nth-of-type(1){animation-delay:.04s}
+  .cat-block:nth-of-type(2){animation-delay:.12s}
+  .cat-block:nth-of-type(3){animation-delay:.20s}
+  .cat-block:nth-of-type(4){animation-delay:.28s}
+  .cat-block:nth-of-type(n+5){animation-delay:.34s}
+}
+@media print{.sheet,.cat-block{animation:none!important;}}
 </style>
 </head>
 <body>

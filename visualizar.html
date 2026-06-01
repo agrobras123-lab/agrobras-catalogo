@@ -171,8 +171,25 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 .empty-icon{font-size:42px;filter:drop-shadow(0 4px 10px rgba(13,43,26,.12));}
 .skel-box,.skel-hdr{background:linear-gradient(90deg,#eef7f0 25%,#dbeede 50%,#eef7f0 75%);background-size:200% 100%;}
 </style>
+<style id="premium-anim">
+/* Animações — entrada da página e revelação escalonada (só no 1º load). */
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.99)}to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:no-preference){
+  body{animation:pageIn .4s ease both;}
+  body.boot #product-list .group{animation:cardIn .5s cubic-bezier(.22,1,.36,1) both;}
+  body.boot #product-list .group:nth-child(1){animation-delay:.03s}
+  body.boot #product-list .group:nth-child(2){animation-delay:.10s}
+  body.boot #product-list .group:nth-child(3){animation-delay:.17s}
+  body.boot #product-list .group:nth-child(4){animation-delay:.24s}
+  body.boot #product-list .group:nth-child(5){animation-delay:.31s}
+  body.boot #product-list .group:nth-child(n+6){animation-delay:.37s}
+  .empty-icon{animation:floaty 3s ease-in-out infinite;}
+}
+</style>
 </head>
-<body>
+<body class="boot">
 <header>
   <div class="hdr-top">
     <div class="logo">
@@ -315,6 +332,7 @@ function setData(d){
   if(d.updatedAt){const dt=new Date(d.updatedAt);document.getElementById('last-update').textContent=dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
   document.getElementById('skeletons').style.display='none';
   buildPills();renderList();
+  if(!window._booted){window._booted=1;setTimeout(()=>document.body.classList.remove('boot'),1100);}
   checkValidity(d.updatedAt);
 }
 function buildPills(){

@@ -312,8 +312,35 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 .empty-icon{font-size:42px;filter:drop-shadow(0 4px 10px rgba(13,43,26,.12));}
 .skel-box,.skel-hdr{background:linear-gradient(90deg,#eef7f0 25%,#dbeede 50%,#eef7f0 75%);background-size:200% 100%;}
 </style>
+<style id="premium-anim">
+/* ============================================================
+   Animações — entrada da página, revelação escalonada dos
+   cards (só no carregamento), brilho nos botões, vida no vazio.
+   Respeita "prefers-reduced-motion".
+   ============================================================ */
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.99)}to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:no-preference){
+  body{animation:pageIn .4s ease both;}
+  /* revelação escalonada — aplicada apenas no 1º carregamento (body.boot) */
+  body.boot #product-list .group{animation:cardIn .5s cubic-bezier(.22,1,.36,1) both;}
+  body.boot #product-list .group:nth-child(1){animation-delay:.03s}
+  body.boot #product-list .group:nth-child(2){animation-delay:.10s}
+  body.boot #product-list .group:nth-child(3){animation-delay:.17s}
+  body.boot #product-list .group:nth-child(4){animation-delay:.24s}
+  body.boot #product-list .group:nth-child(5){animation-delay:.31s}
+  body.boot #product-list .group:nth-child(n+6){animation-delay:.37s}
+  .qty-panel.open{animation:cardIn .26s ease both;}
+  .empty-icon{animation:floaty 3s ease-in-out infinite;}
+  /* brilho deslizante nos botões de ação principais */
+  .cart-btn,.wha-btn,.add-custom-btn{position:relative;overflow:hidden;}
+  .cart-btn::after,.wha-btn::after,.add-custom-btn::after{content:"";position:absolute;top:0;left:-75%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.40),transparent);transform:skewX(-20deg);pointer-events:none;transition:left .55s ease;}
+  .cart-btn:hover::after,.wha-btn:hover::after,.add-custom-btn:hover::after{left:130%;}
+}
+</style>
 </head>
-<body>
+<body class="boot">
 <header>
   <div class="hdr">
     <div class="logo">
@@ -547,6 +574,7 @@ async function loadProducts(){
     document.getElementById('err-bar').style.display='none';
     document.getElementById('skeletons').style.display='none';
     buildPills();renderList();
+    if(!window._booted){window._booted=1;setTimeout(()=>document.body.classList.remove('boot'),1100);}
     scheduleRefresh(REFRESH_MS);
   }catch(e){
     loadFailed=true;

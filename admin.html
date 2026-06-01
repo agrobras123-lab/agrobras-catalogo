@@ -281,9 +281,38 @@ tbody tr.invalid{background:linear-gradient(135deg,#fdeceb,#fbe2e0);}
 
 /* ── Skeleton ──────────────────────────────────────────── */
 .skel{background:linear-gradient(90deg,#eef7f0 25%,#dbeede 50%,#eef7f0 75%);background-size:200% 100%;}
+
+/* ── Animações ─────────────────────────────────────────── */
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+@keyframes rowIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:no-preference){
+  body{animation:pageIn .4s ease both;}
+  /* revelação escalonada — só no 1º carregamento (body.boot) */
+  body.boot #tbody tr{animation:rowIn .42s cubic-bezier(.22,1,.36,1) both;}
+  body.boot #tbody tr:nth-child(1){animation-delay:.02s}
+  body.boot #tbody tr:nth-child(2){animation-delay:.06s}
+  body.boot #tbody tr:nth-child(3){animation-delay:.10s}
+  body.boot #tbody tr:nth-child(4){animation-delay:.14s}
+  body.boot #tbody tr:nth-child(5){animation-delay:.18s}
+  body.boot #tbody tr:nth-child(6){animation-delay:.22s}
+  body.boot #tbody tr:nth-child(7){animation-delay:.26s}
+  body.boot #tbody tr:nth-child(n+8){animation-delay:.30s}
+  body.boot #cards .pcard{animation:cardIn .45s cubic-bezier(.22,1,.36,1) both;}
+  body.boot #cards .pcard:nth-child(1){animation-delay:.03s}
+  body.boot #cards .pcard:nth-child(2){animation-delay:.10s}
+  body.boot #cards .pcard:nth-child(3){animation-delay:.17s}
+  body.boot #cards .pcard:nth-child(n+4){animation-delay:.23s}
+  .empty .ico{animation:floaty 3s ease-in-out infinite;}
+  /* brilho deslizante no botão Publicar e no botão primário */
+  .btn-pub,button.ctl.primary{position:relative;overflow:hidden;}
+  .btn-pub::after,button.ctl.primary::after{content:"";position:absolute;top:0;left:-75%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);pointer-events:none;transition:left .55s ease;}
+  .btn-pub:not(:disabled):hover::after,button.ctl.primary:hover::after{left:130%;}
+}
 </style>
 </head>
-<body>
+<body class="boot">
 
 <header class="topbar">
   <div class="topbar-in">
@@ -576,6 +605,7 @@ async function loadData(){
     document.getElementById('skel-area').style.display='none';
     updateUpd();
     render();
+    if(!window._booted){window._booted=1;setTimeout(()=>document.body.classList.remove('boot'),1200);}
     refreshDirtyUI();
     maybeOfferDraft();
   }catch(e){
