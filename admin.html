@@ -171,6 +171,117 @@ tbody tr.invalid{background:var(--red-bg);}
   .wrap{padding:12px;}
 }
 </style>
+<style id="premium-theme">
+/* ============================================================
+   AGRO BRAS · Painel — tema visual premium (camada de override)
+   Ferramenta de lançar / editar itens. Mantém todos os hooks
+   de classe/ID usados pelo JS — apenas eleva o visual.
+   ============================================================ */
+:root{
+  --green:#1f5c2f;--green-d:#164323;--green-l:#eaf6ee;
+  --bg:#f1f8f3;--card:#ffffff;--line:#e4f0e8;--line-2:#cbe6d3;
+  --txt:#15261b;--muted:#5d7567;--soft:#9fb3a6;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(13,43,26,.06),0 2px 6px rgba(13,43,26,.05);
+  --sh-md:0 2px 8px rgba(13,43,26,.06),0 6px 18px rgba(13,43,26,.07);
+  --sh-lg:0 12px 36px rgba(13,43,26,.14);
+  --grad-head:linear-gradient(135deg,#1f6b39 0%,#123f20 100%);
+  --grad-leaf:linear-gradient(135deg,#2e9a47 0%,#1f5c2f 100%);
+  --grad-leaf-h:linear-gradient(135deg,#34a64f 0%,#1f7536 100%);
+  --mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+body{background:radial-gradient(1100px 420px at 50% -160px,rgba(46,154,71,.10),transparent 70%),linear-gradient(180deg,#ecf6ef,#f1f8f3 320px);background-attachment:fixed;color:var(--txt);}
+
+/* ── Topbar ────────────────────────────────────────────── */
+.topbar{background:var(--grad-head);box-shadow:0 6px 24px rgba(8,30,18,.26),inset 0 -1px 0 rgba(255,255,255,.07);overflow:hidden;}
+.topbar::before{content:"";position:absolute;top:-80%;right:4%;width:240px;height:240px;background:radial-gradient(circle,rgba(120,220,150,.26),transparent 68%);pointer-events:none;}
+.topbar-in{position:relative;padding:13px 16px;}
+.brand{font-size:16.5px;letter-spacing:-.2px;}
+.brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,.30),rgba(255,255,255,.10));box-shadow:0 3px 10px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.3);font-size:18px;}
+.brand small{font-size:11px;opacity:.82;letter-spacing:.2px;}
+.install-btn{border-radius:30px;backdrop-filter:blur(6px);transition:.15s;}
+.install-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.26);}
+.key-state{border-radius:30px;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18);transition:.15s;padding:6px 12px;}
+.key-state:hover{background:rgba(255,255,255,.22);}
+.key-state.ok{background:rgba(120,220,150,.22);border-color:rgba(120,220,150,.4);}
+.key-dot{box-shadow:0 0 8px rgba(255,210,125,.7);}
+.key-state.ok .key-dot{box-shadow:0 0 8px rgba(127,224,160,.9);}
+
+/* ── Banners ───────────────────────────────────────────── */
+.banner{border-radius:14px;box-shadow:var(--shadow);}
+.banner-info{background:linear-gradient(135deg,#fff7e6,#fef0d3);border:1px solid #f3d699;}
+.banner-err{background:linear-gradient(135deg,#fdeceb,#fbdedb);border:1px solid #f3c6c1;}
+.banner-warn{background:linear-gradient(135deg,#eef9f1,#e2f3e8);border:1px solid var(--line-2);}
+.banner button{border-radius:9px;transition:.15s;}
+.banner button.solid{box-shadow:0 3px 10px rgba(0,0,0,.12);}
+
+/* ── Estatísticas ──────────────────────────────────────── */
+.stat{background:#fff;border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s;}
+.stat:hover{transform:translateY(-1px);box-shadow:var(--sh-md);}
+
+/* ── Toolbar ───────────────────────────────────────────── */
+.search input{border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s;}
+.search input:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(46,154,71,.13);}
+select.ctl,button.ctl,a.ctl{border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);transition:.15s;}
+a.ctl{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;padding:9px 12px;background:#fff;color:var(--txt);}
+button.ctl:hover,a.ctl:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--sh-md);}
+button.ctl.primary{background:var(--grad-leaf);border-color:transparent;box-shadow:0 4px 14px rgba(46,154,71,.32);}
+button.ctl.primary:hover{background:var(--grad-leaf-h);}
+
+/* ── Chips de categoria ────────────────────────────────── */
+.cat-chip{border:1.5px solid var(--line);border-radius:30px;box-shadow:var(--shadow);transition:.15s;}
+.cat-chip:hover{border-color:var(--line-2);transform:translateY(-1px);}
+.cat-chip.on{background:var(--grad-leaf);border-color:transparent;box-shadow:0 4px 12px rgba(46,154,71,.3);}
+
+/* ── Tabela (desktop) ──────────────────────────────────── */
+.table-card{border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh-md);}
+thead th{background:linear-gradient(135deg,#f1fbf4,#e9f6ed);color:var(--green);font-weight:700;border-bottom:1px solid var(--line);}
+tbody tr{transition:background .12s;}
+tbody tr:hover{background:#f5fbf7;}
+tbody tr.dirty{background:linear-gradient(135deg,#fffdf4,#fff9e8);}
+tbody tr.invalid{background:linear-gradient(135deg,#fdeceb,#fbe2e0);}
+.t-emoji{font-size:23px;}
+.t-in{border:1.5px solid transparent;border-radius:9px;background:#f4faf6;transition:.15s;}
+.t-in:hover{border-color:var(--line-2);}
+.t-in:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(46,154,71,.12);}
+.t-in.num{font-family:var(--mono);}
+.col-cat select{border:1.5px solid transparent;border-radius:9px;background:#f4faf6;transition:.15s;}
+.col-cat select:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(46,154,71,.12);}
+.unit-mode{color:var(--soft);}
+.icon-btn{border-radius:9px;transition:.15s;}
+.icon-btn:hover{background:var(--green-l);color:var(--green);transform:translateY(-1px);}
+.icon-btn.del:hover{background:#fdeceb;color:#c0392b;}
+
+/* ── Cards (mobile) ────────────────────────────────────── */
+.pcard{border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh-md);transition:box-shadow .2s;}
+.pcard.dirty{border-color:#e8d59a;background:linear-gradient(135deg,#fffdf4,#fff9ec);}
+.pcard.invalid{border-color:#c0392b;}
+.fld-label{color:var(--soft);}
+
+/* ── Barra de ações (rodapé) ───────────────────────────── */
+.actionbar{background:rgba(255,255,255,.88);backdrop-filter:blur(20px) saturate(1.5);border-top:1px solid rgba(203,230,211,.8);box-shadow:0 -10px 34px rgba(13,43,26,.14);}
+.btn{border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);transition:.15s;}
+.btn:hover{border-color:var(--green);transform:translateY(-1px);box-shadow:var(--sh-md);}
+.btn-add{border-style:dashed;}
+.btn-pub{background:var(--grad-leaf);border-color:transparent;box-shadow:0 5px 16px rgba(46,154,71,.34);}
+.btn-pub:hover{background:var(--grad-leaf-h);transform:translateY(-1px);box-shadow:0 8px 22px rgba(46,154,71,.42);}
+.btn-pub:disabled{background:var(--grad-leaf);transform:none;}
+.dirty-info b{color:#b7791f;}
+
+/* ── Modais ────────────────────────────────────────────── */
+.modal-bg{backdrop-filter:blur(6px);background:rgba(9,32,19,.5);}
+.modal{border-radius:22px;box-shadow:0 24px 70px rgba(8,30,18,.4);}
+.modal h2{letter-spacing:-.3px;}
+.modal input[type=password],.modal input[type=text],.modal textarea{border:1.5px solid var(--line);border-radius:12px;transition:border-color .2s,box-shadow .2s;}
+.modal input:focus,.modal textarea:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(46,154,71,.12);}
+
+/* ── Toast ─────────────────────────────────────────────── */
+.toast{background:linear-gradient(135deg,#1f6b39,#123f20);border-radius:14px;box-shadow:0 12px 34px rgba(8,30,18,.4);}
+.toast.err{background:linear-gradient(135deg,#d0432f,#a32a1c);}
+
+/* ── Skeleton ──────────────────────────────────────────── */
+.skel{background:linear-gradient(90deg,#eef7f0 25%,#dbeede 50%,#eef7f0 75%);background-size:200% 100%;}
+</style>
 </head>
 <body>
 

@@ -73,6 +73,44 @@ body{font-family:"DM Sans",sans-serif;background:#e8e8e8;color:#0d1f12;-webkit-f
   .wpp-btn{display:none!important;}
 }
 </style>
+<style id="premium-theme">
+/* ============================================================
+   AGRO BRAS · Tema visual premium (camada de override)
+   Documento para impressão / PDF. Melhora a pré-visualização
+   na tela mantendo a saída impressa limpa.
+   ============================================================ */
+:root{--grad-head:linear-gradient(135deg,#15401f 0%,#0c2818 100%);}
+body{background:radial-gradient(900px 420px at 50% -120px,rgba(46,154,71,.10),transparent 70%),linear-gradient(180deg,#eceeec,#e6e9e6);}
+
+.action-bar{background:rgba(13,43,26,.82);backdrop-filter:blur(12px) saturate(1.4);box-shadow:0 4px 20px rgba(8,30,18,.28);border-bottom:1px solid rgba(255,255,255,.06);}
+.back-btn{border-radius:9px;transition:.15s;}
+.back-btn:hover{background:rgba(255,255,255,.26);}
+.print-btn{border-radius:9px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.22);transition:transform .15s,box-shadow .15s;}
+.print-btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(0,0,0,.28);}
+
+.sheet{border-radius:18px;overflow:hidden;box-shadow:0 16px 50px rgba(8,30,18,.18),0 4px 14px rgba(8,30,18,.10);}
+.doc-header{background:var(--grad-head);position:relative;overflow:hidden;}
+.doc-header::before{content:"";position:absolute;top:-60%;right:-4%;width:300px;height:300px;background:radial-gradient(circle,rgba(77,184,106,.26),transparent 68%);pointer-events:none;}
+.logo-img{border-radius:11px;box-shadow:0 4px 12px rgba(0,0,0,.28);}
+.brand-name{letter-spacing:-.4px;}
+.brand-sub{font-weight:600;letter-spacing:1.2px;}
+.doc-info{background:linear-gradient(135deg,#1a4a28,#163e22);}
+.doc-info-badge{backdrop-filter:blur(4px);}
+.doc-contact-bar{background:linear-gradient(135deg,#edfaf1,#e2f3e8);border-bottom:2px solid #cbe6d3;}
+.cat-header{background:linear-gradient(135deg,#edfaf1,#e2f3e8);}
+.cat-name{letter-spacing:-.2px;}
+.cat-count{background:#fff;border:1px solid #cbe6d3;}
+.col-bar{background:linear-gradient(135deg,#247a38,#1f5c2f);}
+.prod-table td:last-child{font-weight:600;}
+.doc-footer{background:var(--grad-head);position:relative;overflow:hidden;}
+.wpp-btn{background:linear-gradient(135deg,#2bd66c,#16a64c);border-radius:9px;box-shadow:0 4px 14px rgba(37,211,102,.4);}
+.error-box{background:linear-gradient(135deg,#fff7e6,#fef0d3);border:1px solid #f3d699;border-radius:13px;box-shadow:0 4px 16px rgba(0,0,0,.08);}
+
+@media print{
+  .sheet{box-shadow:none!important;border-radius:0!important;}
+  .action-bar{display:none!important;}
+}
+</style>
 </head>
 <body>
 
