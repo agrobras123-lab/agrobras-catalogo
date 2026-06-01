@@ -702,13 +702,18 @@ async function publish(){
   payload.products=cleanProducts(products);
   payload.updatedAt=new Date().toISOString();
 
+  // Timeout para não travar indefinidamente se a rede/JSONBin não responder.
+  const ctrl=new AbortController();
+  const killer=setTimeout(()=>ctrl.abort(),25000);
   try{
     const r=await fetch(API_BASE,{
       method:'PUT',
       headers:{'Content-Type':'application/json','X-Master-Key':apiKey},
-      body:JSON.stringify(payload)
+      body:JSON.stringify(payload),
+      signal:ctrl.signal
     });
     if(r.status===401||r.status===403){throw new Error('Chave inválida ou sem permissão (HTTP '+r.status+').');}
+    if(r.status===429){throw new Error('Muitas requisições em pouco tempo (HTTP 429). Aguarde alguns segundos e tente de novo.');}
     if(!r.ok){let m='';try{m=(await r.json()).message||'';}catch(e){}throw new Error('Falha ao publicar (HTTP '+r.status+'). '+m);}
     rawData=payload;
     serverSnapshot=snapshot(products);
@@ -717,9 +722,12 @@ async function publish(){
     refreshDirtyUI();
     toast('✅ Publicado! O catálogo será atualizado em instantes.');
   }catch(e){
-    toast('❌ '+(e.message||'Erro ao publicar.'),true);
+    let msg=e.message||'Erro ao publicar.';
+    if(e.name==='AbortError')msg='A conexão demorou demais e foi cancelada. Suas alterações continuam salvas aqui — verifique a internet e toque em Publicar de novo.';
+    toast('❌ '+msg,true);
     if(/inválida|401|403/.test(e.message||''))openKeyModal();
   }finally{
+    clearTimeout(killer);
     btn.disabled=false;refreshDirtyUI();
   }
 }
