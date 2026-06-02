@@ -61,7 +61,8 @@ header{background:#14391f;position:sticky;top:0;z-index:100;box-shadow:0 2px 12p
 .prod-row:hover{background:#f5faf6;}
 .prod-row.selected{background:#edfaf1;}
 .prod-main{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;}
-.prod-emoji{width:36px;height:36px;background:#f5faf6;border:1px solid #daeee0;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.prod-emoji{width:36px;height:36px;background:#f5faf6;border:1px solid #daeee0;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+.prod-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;}
 .prod-info{min-width:0;}
 .prod-name{font-size:13px;font-weight:500;color:#0d1f12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .prod-pkg{font-size:11px;color:#8aa891;margin-top:1px;}
@@ -244,7 +245,7 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 .prod-row:hover{background:#f3fbf5;}
 .prod-row.selected{background:linear-gradient(135deg,#f0fbf3,#e6f6ec);box-shadow:inset 3px 0 0 var(--g400);}
 .prod-main{grid-template-columns:44px 1fr auto;gap:12px;}
-.prod-emoji{width:44px;height:44px;border-radius:13px;font-size:21px;background:linear-gradient(140deg,#ffffff,#ecf7ef);border:1px solid var(--bdr);box-shadow:0 2px 7px rgba(13,43,26,.07),inset 0 1px 0 rgba(255,255,255,.7);}
+.prod-emoji{width:44px;height:44px;border-radius:13px;font-size:21px;background:linear-gradient(140deg,#ffffff,#ecf7ef);border:1px solid var(--bdr);box-shadow:0 2px 7px rgba(13,43,26,.07),inset 0 1px 0 rgba(255,255,255,.7);overflow:hidden;}
 .prod-name{font-size:13.5px;font-weight:600;color:var(--txt);}
 .prod-pkg{font-size:11px;color:var(--txt3);font-weight:500;}
 .prod-price-wrap{gap:7px;}
@@ -516,6 +517,21 @@ function getUnitLabel(p) {
   return 'un';
 }
 
+// Produtos que já têm foto real em /img (PNG 512×512, fundo branco).
+// Se o arquivo não existir/não carregar, o onerror cai de volta no emoji.
+function imgSlug(p){
+  const n=(p.name||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const keys=['abacaxi','abacate','banana','goiaba','laranja','limao','mamao','melancia','melao','tomate'];
+  for(const k of keys){ if(n.includes(k)) return k; }
+  return '';
+}
+function prodIcon(p){
+  const e=getEmoji(p);
+  const slug=imgSlug(p);
+  if(!slug) return e;
+  return `<img class="prod-img" src="img/${slug}.png" alt="" loading="lazy" decoding="async" onerror="this.replaceWith(document.createTextNode('${e}'))">`;
+}
+
 function getEmoji(p) {
   const n=(p.name||'').toLowerCase();
   if(n.includes('abacate'))return'🥑';if(n.includes('abacaxi'))return'🍍';
@@ -662,7 +678,7 @@ function renderList(){
       const sel=qty>0;
       html+=`<div class="prod-row${sel?' selected':''}" id="pr-${p.id}">
         <div class="prod-main">
-          <div class="prod-emoji">${getEmoji(p)}</div>
+          <div class="prod-emoji">${prodIcon(p)}</div>
           <div class="prod-info">
             <div class="prod-name">${p.name}</div>
             <div class="prod-pkg">${p.unit||''}</div>
