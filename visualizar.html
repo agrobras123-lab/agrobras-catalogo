@@ -247,7 +247,7 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
   <div class="upd-inner">
     <span class="upd-txt"><span aria-hidden="true">🕐</span> Atualizado: <span id="last-update">—</span></span>
     <div style="display:flex;align-items:center;gap:6px;">
-      <button class="print-link no-print" onclick="window.print()" title="Imprimir ou salvar como PDF" aria-label="Imprimir ou salvar como PDF"><span aria-hidden="true">🖨️</span> PDF</button>
+      <button class="print-link no-print" data-pdf-btn data-label="PDF" onclick="downloadPDF()" title="Baixar a tabela em PDF" aria-label="Baixar a tabela em PDF"><span aria-hidden="true">📄</span> <span class="pdf-label">PDF</span></button>
       <button class="refresh-btn" onclick="loadProducts()" title="Atualizar" aria-label="Atualizar preços"><span aria-hidden="true">↻</span></button>
     </div>
   </div>
@@ -421,6 +421,114 @@ function toggleGroup(cat){document.getElementById('grp-'+cat).classList.toggle('
 document.getElementById('search-input').addEventListener('input',e=>{searchQ=e.target.value;renderList();});
 loadProducts();
 // O agendamento do refresh (e o backoff em caso de erro) é feito dentro de loadProducts().
+
+/* ============================================================
+   Geração de PDF no próprio navegador (jsPDF + AutoTable).
+   Substitui window.print(), que é instável no celular —
+   principalmente dentro de apps (WhatsApp/Instagram). Aqui
+   produzimos um arquivo PDF real, que baixa/abre em qualquer
+   aparelho. As bibliotecas ficam embutidas em /vendor e são
+   carregadas só no primeiro clique (não pesam a página).
+   ============================================================ */
+let _pdfLibPromise=null;
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Falha ao carregar '+src));
+    document.head.appendChild(s);
+  });
+}
+function ensurePdfLib(){
+  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve();
+  if(_pdfLibPromise)return _pdfLibPromise;
+  _pdfLibPromise=loadScript('vendor/jspdf.umd.min.js')
+    .then(()=>loadScript('vendor/jspdf.plugin.autotable.min.js'))
+    .catch(e=>{_pdfLibPromise=null;throw e;});
+  return _pdfLibPromise;
+}
+function setPdfBusy(b){
+  document.querySelectorAll('[data-pdf-btn]').forEach(el=>{
+    el.disabled=b;el.style.opacity=b?'.6':'';el.style.pointerEvents=b?'none':'';
+    const lbl=el.querySelector('.pdf-label');if(lbl)lbl.textContent=b?'Gerando…':el.dataset.label;
+  });
+}
+async function downloadPDF(){
+  if(!allProducts.length){alert('A tabela ainda está carregando. Tente novamente em instantes.');return;}
+  setPdfBusy(true);
+  try{
+    await ensurePdfLib();
+    const doc=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+    buildPdf(doc);
+    const d=new Date();
+    const fname='Tabela-AgroBras-'+d.toISOString().slice(0,10)+'.pdf';
+    doc.save(fname);
+  }catch(e){
+    console.error(e);
+    alert('Não foi possível gerar o PDF agora. Verifique a conexão e tente novamente.');
+  }finally{setPdfBusy(false);}
+}
+function buildPdf(doc){
+  const M=40;
+  const pageW=doc.internal.pageSize.getWidth();
+  const pageH=doc.internal.pageSize.getHeight();
+  const cw=pageW-2*M;
+  const updStr=(document.getElementById('last-update').textContent||'').trim();
+
+  // Cabeçalho (página 1)
+  doc.setFillColor(20,57,31);doc.rect(0,0,pageW,72,'F');
+  try{
+    const logo=document.querySelector('header .logo img');
+    if(logo&&logo.src&&logo.src.indexOf('data:image')===0){
+      doc.setFillColor(255,255,255);doc.roundedRect(M,18,38,38,5,5,'F');
+      doc.addImage(logo.src,'JPEG',M+3,21,32,32);
+    }
+  }catch(e){/* sem logo, segue */}
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(18);
+  doc.text('AGRO BRAS',M+48,36);
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(208,240,216);
+  doc.text('Tabela de Preços',M+48,52);
+  doc.text('Atualizado: '+updStr,pageW-M,36,{align:'right'});
+  doc.text(allProducts.length+' produtos',pageW-M,52,{align:'right'});
+
+  // Agrupa por categoria
+  const groups={};
+  allProducts.forEach(p=>{const c=p.category||'outros';(groups[c]=groups[c]||[]).push(p);});
+
+  let startY=90;
+  Object.entries(groups).forEach(([cat,ps])=>{
+    const body=ps.map(p=>[p.name||'',p.unit||'—','R$ '+Number(p.price).toFixed(2).replace('.',',')]);
+    doc.autoTable({
+      startY:startY,
+      margin:{left:M,right:M,top:48,bottom:52},
+      head:[
+        [{content:getCatLabel(cat)+'  ·  '+ps.length+' itens',colSpan:3,
+          styles:{halign:'left',fillColor:[237,250,241],textColor:[31,92,47],fontStyle:'bold',fontSize:11,cellPadding:6}}],
+        ['Produto','Embalagem','Preço (R$)']
+      ],
+      body:body,
+      theme:'grid',
+      styles:{font:'helvetica',fontSize:10,cellPadding:5,textColor:[13,31,18],lineColor:[203,230,211],lineWidth:0.5},
+      headStyles:{fillColor:[31,92,47],textColor:[255,255,255],fontStyle:'bold',fontSize:10},
+      alternateRowStyles:{fillColor:[245,250,246]},
+      columnStyles:{
+        0:{cellWidth:cw*0.50},
+        1:{cellWidth:cw*0.28,textColor:[110,135,118]},
+        2:{cellWidth:cw*0.22,halign:'right',fontStyle:'bold',textColor:[31,92,47]}
+      }
+    });
+    startY=doc.lastAutoTable.finalY+14;
+  });
+
+  // Rodapé em todas as páginas: contato + numeração
+  const total=doc.getNumberOfPages();
+  for(let i=1;i<=total;i++){
+    doc.setPage(i);
+    doc.setDrawColor(203,230,211);doc.setLineWidth(0.5);doc.line(M,pageH-38,pageW-M,pageH-38);
+    doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(110,135,118);
+    doc.text('Agro Bras · CD Pátio do Pari, R. Santa Rosa, 330 – Brás, SP · (11) 93311-2643 · agro.bras123@gmail.com',M,pageH-25);
+    doc.text('Página '+i+' de '+total,pageW-M,pageH-25,{align:'right'});
+  }
+}
 </script>
 
 <div id="contact-card" style="max-width:520px;margin:0 auto 40px;padding:0 16px;">
@@ -445,7 +553,7 @@ loadProducts();
       </a>
     </div>
     <div style="margin-top:10px;font-size:11px;color:#8aa891;text-align:center;">📍 CD Pátio do Pari, R. Santa Rosa, 330 – Brás, SP</div>
-    <button class="print-cta no-print" onclick="window.print()" title="Imprimir ou salvar como PDF"><span aria-hidden="true">🖨️</span> Imprimir / Salvar em PDF</button>
+    <button class="print-cta no-print" data-pdf-btn data-label="Baixar tabela em PDF" onclick="downloadPDF()" title="Baixar a tabela em PDF"><span aria-hidden="true">📄</span> <span class="pdf-label">Baixar tabela em PDF</span></button>
   </div>
 </div>
 
