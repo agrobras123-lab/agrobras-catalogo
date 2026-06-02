@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agro Bras — Tabela de Preços</title>
 <meta name="description" content="Consulta rápida da tabela de preços da Agro Bras, com alerta de validade do dia. Frutas, legumes, hortaliças, temperos, ovos e conservas.">
 <meta name="theme-color" content="#14391f">
@@ -14,13 +14,15 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Agro Bras — Tabela de Preços">
 <meta name="twitter:description" content="Consulta rápida de preços com alerta de validade do dia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --g900:#0d2b1a;--g800:#14391f;--g700:#1a4a28;--g600:#1f5c2f;
   --g500:#247a38;--g400:#2e9a47;--g300:#4db86a;--g100:#d0f0d8;--g50:#edfaf1;
-  --txt:#0d1f12;--txt2:#4a6654;--txt3:#8aa891;
+  --txt:#0d1f12;--txt2:#4a6654;--txt3:#5f7d6b;
   --sur:#ffffff;--sur2:#f5faf6;--bdr:#daeee0;--bdr2:#b5d9be;
   --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--rad:14px;
 }
@@ -140,6 +142,7 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 .live-badge{background:rgba(77,184,106,.16);border:1px solid rgba(77,184,106,.34);backdrop-filter:blur(6px);box-shadow:0 2px 10px rgba(0,0,0,.14);border-radius:30px;padding:5px 12px;color:#d7f5df;font-weight:500;}
 @keyframes pulse{0%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgba(77,184,106,.55)}70%{box-shadow:0 0 0 7px rgba(77,184,106,0)}100%{opacity:.6;transform:scale(.85);box-shadow:0 0 0 0 rgba(77,184,106,0)}}
 .upd-bar{background:rgba(8,30,18,.55);backdrop-filter:blur(4px);border-bottom:1px solid rgba(255,255,255,.05);}
+.upd-txt{color:#9fc0aa;}  /* claro sobre a barra escura (independe de --txt3) */
 .refresh-btn{border-radius:8px;}
 .refresh-btn:hover{color:#fff;transform:rotate(90deg);}
 /* A cor de fundo é definida pelo JS (verde = válida hoje, vermelho = de
