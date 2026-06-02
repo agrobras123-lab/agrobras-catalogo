@@ -76,7 +76,8 @@ header{background:#14391f;position:sticky;top:0;z-index:100;box-shadow:0 2px 12p
 .group.collapsed .group-body{display:none;}
 
 .prod-row{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--bdr);}
-.prod-emoji-box{width:36px;height:36px;background:var(--sur2);border:1px solid var(--bdr);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.prod-emoji-box{width:36px;height:36px;background:var(--sur2);border:1px solid var(--bdr);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+.prod-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;}
 .prod-info{min-width:0;}
 .prod-name{font-size:13px;font-weight:500;color:var(--txt);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .prod-pkg{font-size:11px;color:var(--txt3);margin-top:1px;}
@@ -169,7 +170,7 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 .group-chevron{color:#2e9a47;}
 .prod-row{grid-template-columns:44px 1fr auto;padding:11px 15px;transition:background .15s;}
 .prod-row:hover{background:#f3fbf5;}
-.prod-emoji-box{width:44px;height:44px;border-radius:13px;font-size:21px;background:linear-gradient(140deg,#ffffff,#ecf7ef);border:1px solid var(--bdr);box-shadow:0 2px 7px rgba(13,43,26,.07),inset 0 1px 0 rgba(255,255,255,.7);}
+.prod-emoji-box{width:44px;height:44px;border-radius:13px;font-size:21px;background:linear-gradient(140deg,#ffffff,#ecf7ef);border:1px solid var(--bdr);box-shadow:0 2px 7px rgba(13,43,26,.07),inset 0 1px 0 rgba(255,255,255,.7);overflow:hidden;}
 .prod-name{font-size:13.5px;font-weight:600;}
 .prod-price{font-size:14px;font-weight:600;background:linear-gradient(135deg,#eef8f1,#e2f3e8);border:1px solid var(--bdr2);border-radius:9px;padding:4px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6);}
 .err-bar{background:linear-gradient(135deg,#fff7e6,#fef0d3);border:1px solid #f3d699;border-radius:13px;box-shadow:var(--sh-sm);}
@@ -288,6 +289,20 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 const JSON_URL='https://api.jsonbin.io/v3/b/69df8e81aaba88219700aa58/latest';
 const CAT_EMOJI={frutas:'🍑',legumes:'🥦',hortalicas:'🥬',temperos:'🧄',ovos:'🥚',conservas:'🫙',outros:'🌱'};
 const CAT_LABEL={frutas:'Frutas',legumes:'Legumes',hortalicas:'Hortaliças',temperos:'Temperos & Alho',ovos:'Ovos',conservas:'Conservas',outros:'Outros'};
+// Produtos que já têm foto real em /img (PNG 512×512, fundo branco).
+// Se o arquivo não existir/não carregar, o onerror cai de volta no emoji.
+function imgSlug(p){
+  const n=(p.name||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const keys=['abacaxi','abacate','banana','goiaba','laranja','limao','mamao','melancia','melao','tomate'];
+  for(const k of keys){ if(n.includes(k)) return k; }
+  return '';
+}
+function prodIcon(p){
+  const e=getEmoji(p);
+  const slug=imgSlug(p);
+  if(!slug) return e;
+  return `<img class="prod-img" src="img/${slug}.png" alt="" loading="lazy" decoding="async" onerror="this.replaceWith(document.createTextNode('${e}'))">`;
+}
 function getEmoji(p){
   const n=(p.name||'').toLowerCase();
   if(n.includes('abacate'))return'🥑';if(n.includes('abacaxi'))return'🍍';if(n.includes('banana'))return'🍌';
@@ -411,7 +426,7 @@ function renderList(){
       </div><div class="group-body">`;
     prods.forEach(p=>{
       html+=`<div class="prod-row">
-        <div class="prod-emoji-box">${getEmoji(p)}</div>
+        <div class="prod-emoji-box">${prodIcon(p)}</div>
         <div class="prod-info"><div class="prod-name">${p.name}</div><div class="prod-pkg">${p.unit||''}</div></div>
         <div class="prod-price">R$ ${Number(p.price).toFixed(2).replace('.',',')}</div>
       </div>`;
