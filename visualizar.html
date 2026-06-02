@@ -142,7 +142,9 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 .upd-bar{background:rgba(8,30,18,.55);backdrop-filter:blur(4px);border-bottom:1px solid rgba(255,255,255,.05);}
 .refresh-btn{border-radius:8px;}
 .refresh-btn:hover{color:#fff;transform:rotate(90deg);}
-#validity-bar{background:linear-gradient(135deg,#f5a623,#e8920f)!important;box-shadow:0 2px 12px rgba(245,166,35,.3);}
+/* A cor de fundo é definida pelo JS (verde = válida hoje, vermelho = de
+   outro dia). Aqui só damos profundidade, sem sobrescrever a cor. */
+#validity-bar{box-shadow:0 2px 12px rgba(13,43,26,.18);}
 
 /* ── Pílulas + busca ───────────────────────────────────── */
 .pills-wrap{background:linear-gradient(135deg,#1a4a28,#163e22);box-shadow:inset 0 -1px 0 rgba(0,0,0,.18);}
@@ -209,14 +211,18 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
   /* cabeçalho vira o topo do documento */
   header{position:static!important;box-shadow:none!important;}
   header::before{display:none!important;}
+  .upd-bar{background:#14391f!important;border-bottom:none!important;}  /* sólido = data nítida no papel */
   .hdr-top,.upd-inner,.list-wrap{max-width:100%!important;}
   .list-wrap{padding:8px 0 0!important;}
   /* uma coluna previsível, sem sombras */
   #product-list{display:block!important;}
-  .group{display:block!important;margin:0 0 8px!important;border:1px solid #cbe6d3!important;border-radius:8px!important;box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;}
+  .group{display:block!important;margin:0 0 8px!important;border:1px solid #cbe6d3!important;border-radius:8px!important;box-shadow:none!important;break-inside:auto;page-break-inside:auto;}
   .group.collapsed .group-body{display:block!important;}   /* imprime tudo, mesmo recolhido */
   .group-chevron{display:none!important;}
+  /* categorias longas fluem entre páginas, mas: não corta uma linha de
+     produto ao meio, nem deixa o título da categoria órfão no rodapé */
   .prod-row{break-inside:avoid;page-break-inside:avoid;}
+  .group-header{break-after:avoid;page-break-after:avoid;}
   /* contato: mantém só o rodapé (evita bloco duplicado no papel) */
   #contact-card{display:none!important;}
   #site-footer{margin-top:10px!important;break-inside:avoid;}
