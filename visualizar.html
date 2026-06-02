@@ -142,7 +142,9 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 .upd-bar{background:rgba(8,30,18,.55);backdrop-filter:blur(4px);border-bottom:1px solid rgba(255,255,255,.05);}
 .refresh-btn{border-radius:8px;}
 .refresh-btn:hover{color:#fff;transform:rotate(90deg);}
-#validity-bar{background:linear-gradient(135deg,#f5a623,#e8920f)!important;box-shadow:0 2px 12px rgba(245,166,35,.3);}
+/* A cor de fundo é definida pelo JS (verde = válida hoje, vermelho = de
+   outro dia). Aqui só damos profundidade, sem sobrescrever a cor. */
+#validity-bar{box-shadow:0 2px 12px rgba(13,43,26,.18);}
 
 /* ── Pílulas + busca ───────────────────────────────────── */
 .pills-wrap{background:linear-gradient(135deg,#1a4a28,#163e22);box-shadow:inset 0 -1px 0 rgba(0,0,0,.18);}
@@ -188,6 +190,45 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
   .empty-icon{animation:floaty 3s ease-in-out infinite;}
 }
 </style>
+<style id="print-styles">
+/* ============================================================
+   AGRO BRAS · Impressão / Salvar PDF
+   Reaproveita o catálogo da tela e o reformata em folha A4
+   limpa. Substitui a antiga página pdf.html.
+   ============================================================ */
+.print-link{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#d0f0d8;font-family:var(--font);font-size:11px;font-weight:600;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:background .15s,color .15s;}
+.print-link:hover{background:rgba(255,255,255,.2);color:#fff;}
+.print-cta{width:100%;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:11px;color:#d0f0d8;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;}
+.print-cta:hover{background:rgba(255,255,255,.18);color:#fff;}
+
+@media print{
+  @page{size:A4;margin:12mm;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{background:#fff!important;}
+  body{animation:none!important;}
+  /* esconde tudo que é só de tela */
+  .pills-wrap,.search-wrap,.live-badge,.refresh-btn,.err-bar,#skeletons,.empty,.no-print{display:none!important;}
+  /* cabeçalho vira o topo do documento */
+  header{position:static!important;box-shadow:none!important;}
+  header::before{display:none!important;}
+  .upd-bar{background:#14391f!important;border-bottom:none!important;}  /* sólido = data nítida no papel */
+  .hdr-top,.upd-inner,.list-wrap{max-width:100%!important;}
+  .list-wrap{padding:8px 0 0!important;}
+  /* uma coluna previsível, sem sombras */
+  #product-list{display:block!important;}
+  .group{display:block!important;margin:0 0 8px!important;border:1px solid #cbe6d3!important;border-radius:8px!important;box-shadow:none!important;break-inside:auto;page-break-inside:auto;}
+  .group.collapsed .group-body{display:block!important;}   /* imprime tudo, mesmo recolhido */
+  .group-chevron{display:none!important;}
+  /* categorias longas fluem entre páginas, mas: não corta uma linha de
+     produto ao meio, nem deixa o título da categoria órfão no rodapé */
+  .prod-row{break-inside:avoid;page-break-inside:avoid;}
+  .group-header{break-after:avoid;page-break-after:avoid;}
+  /* contato: mantém só o rodapé (evita bloco duplicado no papel) */
+  #contact-card{display:none!important;}
+  #site-footer{margin-top:10px!important;break-inside:avoid;}
+  #site-footer a[href^="https://wa.me"]{display:none!important;}
+}
+</style>
 </head>
 <body class="boot">
 <header>
@@ -205,7 +246,10 @@ header::before{content:"";position:absolute;top:-70%;right:-6%;width:260px;heigh
 <div class="upd-bar">
   <div class="upd-inner">
     <span class="upd-txt"><span aria-hidden="true">🕐</span> Atualizado: <span id="last-update">—</span></span>
-    <button class="refresh-btn" onclick="loadProducts()" title="Atualizar" aria-label="Atualizar preços"><span aria-hidden="true">↻</span></button>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <button class="print-link no-print" onclick="window.print()" title="Imprimir ou salvar como PDF" aria-label="Imprimir ou salvar como PDF"><span aria-hidden="true">🖨️</span> PDF</button>
+      <button class="refresh-btn" onclick="loadProducts()" title="Atualizar" aria-label="Atualizar preços"><span aria-hidden="true">↻</span></button>
+    </div>
   </div>
 </div>
 <div id="validity-bar" style="background:#f5a623;padding:8px 16px;display:none;">
@@ -379,7 +423,7 @@ loadProducts();
 // O agendamento do refresh (e o backoff em caso de erro) é feito dentro de loadProducts().
 </script>
 
-<div style="max-width:520px;margin:0 auto 40px;padding:0 16px;">
+<div id="contact-card" style="max-width:520px;margin:0 auto 40px;padding:0 16px;">
   <div style="background:#14391f;border-radius:14px;padding:18px 20px;-webkit-print-color-adjust:exact;">
     <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:10px;">📞 Entre em Contato</div>
     <a href="https://wa.me/5511933112643" target="_blank"
@@ -401,11 +445,12 @@ loadProducts();
       </a>
     </div>
     <div style="margin-top:10px;font-size:11px;color:#8aa891;text-align:center;">📍 CD Pátio do Pari, R. Santa Rosa, 330 – Brás, SP</div>
+    <button class="print-cta no-print" onclick="window.print()" title="Imprimir ou salvar como PDF"><span aria-hidden="true">🖨️</span> Imprimir / Salvar em PDF</button>
   </div>
 </div>
 
 <!-- RODAPÉ CONTATO -->
-<div style="background:#14391f;padding:18px 16px;margin-top:8px;">
+<div id="site-footer" style="background:#14391f;padding:18px 16px;margin-top:8px;">
   <div style="max-width:520px;margin:0 auto;">
     <div style="color:#fff;font-size:13px;font-weight:600;margin-bottom:10px;">AGRO BRAS</div>
     <div style="display:flex;flex-direction:column;gap:7px;">
