@@ -293,7 +293,7 @@ const CAT_LABEL={frutas:'Frutas',legumes:'Legumes',hortalicas:'Hortaliças',temp
 // Se o arquivo não existir/não carregar, o onerror cai de volta no emoji.
 function imgSlug(p){
   const n=(p.name||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-  const keys=['abacaxi','abacate','banana','goiaba','laranja','limao','mamao','melancia','melao','tomate'];
+  const keys=['abacaxi','abacate','banana','goiaba','laranja','limao','papaia','mamao','melancia','melao','tomate'];
   for(const k of keys){ if(n.includes(k)) return k; }
   return '';
 }
